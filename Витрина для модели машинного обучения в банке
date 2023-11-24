@@ -1,0 +1,23 @@
+select   id_client
+       , name_city
+       , case when gender = 'M' then 1 else 0 end as nflag_gender
+       , age
+       , first_time
+       , case when cellphone is null then 0 else 1 end as nflag_cellphone
+       , is_active
+       , cl_segm
+       , amt_loan
+       , date_loan::date as date_loan
+       , credit_type
+       , sum(amt_loan) over (partition by name_city) as sum_city
+       , amt_loan /sum(amt_loan) over (partition by name_city)::float *100 as share_credit_in_city
+       , sum(amt_loan) over (partition by credit_type) as sum_credit_type
+       , amt_loan /sum(amt_loan) over (partition by credit_type)::float *100 as share_credit_in_credit_type
+       , sum(amt_loan) over (partition by credit_type, name_city) as sum_city_and_type
+       , amt_loan / sum(amt_loan) over (partition by credit_type, name_city) ::float *100 as share_credit_in_credit_type_and_city
+       , count (*) over (partition by name_city) as cnt_credit_in_city
+       , count (*) over (partition by credit_type) as cnt_credit_credit_type
+       , count (*) over (partition by credit_type, name_city) as cnt_credit_in_city_and_credit_type
+from  skybank.late_collection_clients as clients
+    left join skybank.region_dict as dict
+    on clients.id_city = dict.id_city
