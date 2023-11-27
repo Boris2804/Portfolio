@@ -1,0 +1,110 @@
+Датасет с сайта https://www.kaggle.com/
+
+ИССЛЕДОВАНИЕ для начинающего разработчика приложений, которому нужна информация на основе данных, какой тип приложения выбрать для разработки и ответить на следующие вопросы:
+Какой тип приложений наиболее популярен среди пользователей?
+Какие приложения обладают более высоким рейтингом бесплатные или платные?
+Стоит ли добавлять поддержку более 30 языков для разрабатываемого приложения?
+Влияет ли размер описания приложения на рейтинг?
+Какой максимальный, минимальный и средний рейтинг по типам приложений?
+Какие приложения в каждой категории занимают первые места в рейтинге AppStore?
+
+-- У нас есть файл applestore с id приложения, названием приложения, размером приложения, стоимости приложения, валютой, количеством оставленных отзывов о приложении, 
+пользовательским рейтингом, жанром приложения, количеством поддерживаемых устройств IOS, количеством поддерживаемых языков и  возрастным рейтингом.
+--Так как у нас 4 разных файла с описанием приложений,названием приложений и их id. Объединим их в один файл.
+create table apple_store_combined as
+SELECT * from appleStore_description1
+union all 
+select * from appleStore_description2
+union all
+select * from applestore_description3
+union all
+select * from applestore_description4
+
+--Для начала проверим количество уникальных приложений в наших таблицах applestore и apple_store_capple_store_combined, 
+select count(distinct id)
+from apple_store_combined
+--7197 уникальных приложений в таблице с описанием приложений 
+select count(distinct id)
+from applestore
+--7197 уникальных приложений в основной таблице
+--Значит данные из обеих таблиц совпадают по количеству уникальных приложений
+Select  count (*) as missing_values
+from apple_store_combined
+where app_desc is NULL or track_name is NULL
+--Проверили, что в таблице apple_store_combined нет отсутствующих значений 
+Select count (*) as missing_values
+from applestore
+where track_name is NULL or prime_genre is NULL or user_rating is NULL
+--Проверили, что в таблице applestore нет отсутствующих значений 
+
+--Найдем количество приложений разного жанра в магазине AppleStore
+SELECT prime_genre
+              ,count(*) as number_apps
+from applestore
+group by prime_genre
+order by number_apps desc
+--Самое большое количество приложений (3862) представлено в жанре игр
+
+--Найдем минимальный,максимальный и средний рейтинг для каждого жанра 
+select       prime_genre
+	   , MIN(user_rating) as min_user_rating
+               , MAX(user_rating) as max_user_rating
+               , avg(user_rating) as avg_user_rating
+from applestore
+group by prime_genre
+order by avg_user_rating desc
+
+--Проверим гипотезу, что платные приложения в среднем обладают большим рейтингом, чем бесплатные.
+SELECT   case when price >0 then 'paid' else 'free' END as type_app
+                 , AVG(user_rating) as avg_user_rating
+from applestore
+group by type_app
+order by avg_user_rating desc
+--Платные приложения действительно обладают более высоким рейтингом.
+
+--Проверим гипотезу, что чем больше языков поддерживает приложение, тем выше у него рейтинг.
+select case  when lang_num <10 then '<10 languages'
+             when lang_num BETWEEN 10 and 30 then '10-30 languages'
+             else '>30 languages'
+             END as languages_bucket
+            ,avg(user_rating) as avg_rating
+from applestore
+group by languages_bucket
+order by avg_rating desc
+--Наша гипотеза не подтвердилась, наибольшим средним рейтингом обладают приложения, которые поддерживают от 10 до 30 языков.
+
+--Проверим есть ли корреляция между длинной описания приложения и его рейтингом.
+select case  when LENGTH(t2.app_desc) < 500 then 'short'
+		when LENGTH(t2.app_desc) BETWEEN 500 and 1000 then 'middle'
+             else 'long'
+             end as length_desc
+            ,avg(user_rating) as avg_user_rating
+from applestore t1
+JOIN apple_store_combined AS t2
+     on t1.id = t2.id
+group by length_desc
+order by avg_user_rating DESC
+--Приложения с длинным описанием имеют более высокий средний рейтинг
+
+--Найдем самые популярные приложения в каждой категории по количеству оставленных отзывов и по рейтингу приложения
+select  prime_genre
+           ,user_rating
+           ,track_name
+from (Select  prime_genre
+         ,user_rating
+         ,track_name
+         ,RANK () over (PARTITION by prime_genre order by user_rating DESC, rating_count_tot desc) as rang
+	    from applestore
+     )t1
+WHERE rang =1 
+
+Рекомендации для заказчика:
+Платные приложения получают чуть более высокие рейтинги у пользователей, чем бесплатные. Возможно,люди которые заплатили за приложение более вовлечены и воспринимают его как ценный продукт, что приводит к повышению рейтинга.
+Так что если наш клиент считает, что его приложение качественное, он может сделать его платным.
+Приложения, которые поддерживают умеренное количество языков от 10 до 30 обладают большим рейтингом чем те, которые поддерживают до 10 языков или более 30. Так что лучше сосредоточиться на “правильных” языках для приложения.
+Приложения в категории книги и финансы обладают наименьшим средним рейтингом.Значит потребности пользователей в этих категориях не удовлетворяются и эта хорошая рыночная возможность для нового приложения в данных категориях.
+В категориях игры и развлечения представлено наибольшее количество приложений. Поэтому пробиться в лидеры этой категории будет наиболее трудно из-за высокой конкуренции,
+однако, это также говорит, что приложения в данных категориях пользуются наибольшим спросом.
+Приложения с более подробным описанием функционала обладают рейтингом выше, чем приложения с коротким описанием до 1000 символов. Скорее всего, это связано с тем,
+что пользователи не могут понять по описанию подходит ли это приложения под их задачи или нет.
+После размещения приложения в AppStore нужно стремиться к рейтингу более 3,5(среднего рейтинга в магазине приложений).
