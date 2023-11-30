@@ -34,8 +34,6 @@
 > <a href="https://github.com/Boris2804/Portfolio/blob/main/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%201.%20%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%20%D0%BF%D1%80%D0%BE%D0%B4%D0%B0%D0%B6%20%D0%BA%D0%BE%D1%84%D0%B5.xlsx">Ссылка на проект</a>
 
 
-<p>Выводы (итоги):<p>
-<ol>
   <p>Итог <p> Готовый дашборд по требованиям заказчика.
 </ol>
 <br> 
