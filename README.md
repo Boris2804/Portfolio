@@ -31,7 +31,7 @@
 </ol>
 
 
-> <a href="https://github.com/Skyproportfolio/data-analytics-5month/blob/main/Проект%20№1.xlsx">Ссылка на проект</a>
+> <a href="https://github.com/Boris2804/Portfolio/blob/main/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%201.%20%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%20%D0%BF%D1%80%D0%BE%D0%B4%D0%B0%D0%B6%20%D0%BA%D0%BE%D1%84%D0%B5.xlsx">Ссылка на проект</a>
   (ссылка должна содержать демонстративные материалы: скриншоты, таблички, запросы, код. Работодатель должен иметь возможность быстро посмотреть результаты работы)
 
 <p>Выводы (итоги):<p>
