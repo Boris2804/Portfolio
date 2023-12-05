@@ -39,6 +39,7 @@
 
 
   <p>Итог <p> Готовый дашборд по требованиям заказчика.
+    <p> ![Dashboard](https://github.com//Boris2804/Portfolio/blob/main/dashboard.png)
 </ol>
 <br> 
 
